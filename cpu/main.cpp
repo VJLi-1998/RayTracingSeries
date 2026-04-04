@@ -4,7 +4,20 @@
 #include "include/vec3.h"
 #include "include/ray.h"
 
+bool hit_sphere(const POINT3& center, float radius, const RAY& r) {
+    VEC3 oc = center - r.origin();
+    auto a = r.direction().length_squared();
+    auto b = -2 * dot(oc, r.direction());
+    auto c = oc.length_squared() - radius*radius;
+    auto discriminant = b*b - 4*a*c;
+    return (discriminant >= 0);
+}
+
 COLOR ray_color(const RAY& r) {
+    if (hit_sphere(POINT3(0,0,-1), 0.5, r)) {
+        return COLOR(1, 0, 0);
+    }
+
     VEC3 unit_direction = unit_vector(r.direction());
     float t = 0.5*(unit_direction.y() + 1.0);
     return (1.0-t)*COLOR(1.0, 1.0, 1.0) + t*COLOR(0.5, 0.7, 1.0);
@@ -13,7 +26,7 @@ COLOR ray_color(const RAY& r) {
 int main() {
     // IMAGE
     float aspect_ratio = 16.0 / 9.0;
-    int image_width = 400;
+    int image_width = 1080;
     int image_height = static_cast<int>(image_width / aspect_ratio);
 
     // CAMERA
