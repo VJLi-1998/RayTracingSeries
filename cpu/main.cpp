@@ -1,21 +1,13 @@
 #include <iostream>
 
-#include "include/color.h"
-#include "include/vec3.h"
-#include "include/ray.h"
+#include "include/common_header.h"
+#include "include/hitable.h"
+#include "include/sphere.h"
 
-bool hit_sphere(const POINT3& center, float radius, const RAY& r) {
-    VEC3 oc = center - r.origin();
-    auto a = r.direction().length_squared();
-    auto b = -2 * dot(oc, r.direction());
-    auto c = oc.length_squared() - radius*radius;
-    auto discriminant = b*b - 4*a*c;
-    return (discriminant >= 0);
-}
-
-COLOR ray_color(const RAY& r) {
-    if (hit_sphere(POINT3(0,0,-1), 0.5, r)) {
-        return COLOR(1, 0, 0);
+COLOR ray_color(const RAY& r, const HITABLE_OBJECT& world) {
+    HIT_RECORD result;
+    if (world.hit(r, INTERVAL(0, infinity), result)) {
+        return 0.5 * COLOR(result.normal.x() + 1, result.normal.y() + 1, result.normal.z() + 1);
     }
 
     VEC3 unit_direction = unit_vector(r.direction());
@@ -26,7 +18,7 @@ COLOR ray_color(const RAY& r) {
 int main() {
     // IMAGE
     float aspect_ratio = 16.0 / 9.0;
-    int image_width = 1080;
+    int image_width = 400;
     int image_height = static_cast<int>(image_width / aspect_ratio);
 
     // CAMERA
@@ -35,6 +27,11 @@ int main() {
     float viewport_width = viewport_height * (1.0 * image_width / image_height);
 
     POINT3 camera_center = POINT3(0, 0, 0);
+
+    // WORLD HITABLE OBJECTS
+    HITABLE_OBJECT_LIST world;
+    world.add(std::make_shared<SPHERE>(POINT3(0, 0, -1), 0.5));
+    world.add(std::make_shared<SPHERE>(POINT3(0, -100.5, -1), 100));
     
     // VIEWPORT
     VEC3 viewport_h = VEC3(viewport_width, 0, 0);
@@ -56,7 +53,7 @@ int main() {
             auto ray_direction = pixel_cur - camera_center;
             RAY r(camera_center, ray_direction);
 
-            COLOR pixel_color = ray_color(r);
+            COLOR pixel_color = ray_color(r, world);
             write_color(std::cout, pixel_color);
         }
     }
