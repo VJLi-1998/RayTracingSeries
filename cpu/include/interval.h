@@ -20,6 +20,12 @@ class INTERVAL {
         bool surrounds(float value) const {
             return m_min < value && m_max > value;
         }
+
+        float clamp(float value) const {
+            if (value < m_min) return m_min;
+            if (value > m_max) return m_max;
+            return value;
+        }
     
     public:
         static const INTERVAL EMPTY;

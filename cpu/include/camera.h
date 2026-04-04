@@ -21,8 +21,13 @@ public:
                 auto ray_direction = pixel_cur - camera_center;
                 RAY r(camera_center, ray_direction);
 
-                COLOR pixel_color = ray_color(r, world);
-                write_color(std::cout, pixel_color);
+                COLOR pixel_color = COLOR(0, 0, 0);
+
+                for (int sample = 0; sample < samples_per_pixel; ++sample) {
+                    RAY sample_ray = get_sample_ray(i, j);
+                    pixel_color += ray_color(sample_ray, world);
+                }
+                write_color(std::cout, pixel_color / samples_per_pixel);
             }
         }
 
@@ -30,6 +35,7 @@ public:
     }
 
 private:
+    int samples_per_pixel = 1;
     int image_width, image_height;
     POINT3 camera_center;
     VEC3 pixel_delta_h, pixel_delta_v;
@@ -71,6 +77,12 @@ private:
         return (1.0-t)*COLOR(1.0, 1.0, 1.0) + t*COLOR(0.5, 0.7, 1.0);
     }
 
+    RAY get_sample_ray(const int i, const int j) {
+        float u = (i + random_float() - 0.5);
+        float v = (j + random_float() - 0.5);
+        VEC3 ray_direction = pixel_upleft + u * pixel_delta_h + v * pixel_delta_v - camera_center;
+        return RAY(camera_center, ray_direction);
+    }
 };
 
 #endif // CAMERA_H
