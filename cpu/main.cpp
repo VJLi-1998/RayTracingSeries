@@ -3,61 +3,18 @@
 #include "include/common_header.h"
 #include "include/hitable.h"
 #include "include/sphere.h"
-
-COLOR ray_color(const RAY& r, const HITABLE_OBJECT& world) {
-    HIT_RECORD result;
-    if (world.hit(r, INTERVAL(0, infinity), result)) {
-        return 0.5 * COLOR(result.normal.x() + 1, result.normal.y() + 1, result.normal.z() + 1);
-    }
-
-    VEC3 unit_direction = unit_vector(r.direction());
-    float t = 0.5*(unit_direction.y() + 1.0);
-    return (1.0-t)*COLOR(1.0, 1.0, 1.0) + t*COLOR(0.5, 0.7, 1.0);
-}
+#include "include/camera.h"
 
 int main() {
-    // IMAGE
-    float aspect_ratio = 16.0 / 9.0;
-    int image_width = 400;
-    int image_height = static_cast<int>(image_width / aspect_ratio);
-
-    // CAMERA
-    float focal_length = 1.0;
-    float viewport_height = 2.0;
-    float viewport_width = viewport_height * (1.0 * image_width / image_height);
-
-    POINT3 camera_center = POINT3(0, 0, 0);
 
     // WORLD HITABLE OBJECTS
     HITABLE_OBJECT_LIST world;
     world.add(std::make_shared<SPHERE>(POINT3(0, 0, -1), 0.5));
     world.add(std::make_shared<SPHERE>(POINT3(0, -100.5, -1), 100));
     
-    // VIEWPORT
-    VEC3 viewport_h = VEC3(viewport_width, 0, 0);
-    VEC3 viewport_v = VEC3(0, -viewport_height, 0);
+    // CAMERA
+    CAMERA cam;
+    cam.render(world);
 
-    VEC3 pixel_delta_h = viewport_h / image_width;
-    VEC3 pixel_delta_v = viewport_v / image_height;
-
-    VEC3 viewport_upleft = camera_center - VEC3(0,0,focal_length) - viewport_h/2 - viewport_v/2;  
-    VEC3 pixel_upleft = viewport_upleft + (pixel_delta_h + pixel_delta_v) / 2;
-
-    // RENDER
-    std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-
-    for (int j = 0; j < image_height; ++j) {
-        std::clog << "\rScanlines remaining: " << image_height - j - 1 << ' ' << std::flush;
-        for (int i = 0; i < image_width; ++i) {
-            auto pixel_cur = pixel_upleft + i * pixel_delta_h + j * pixel_delta_v;
-            auto ray_direction = pixel_cur - camera_center;
-            RAY r(camera_center, ray_direction);
-
-            COLOR pixel_color = ray_color(r, world);
-            write_color(std::cout, pixel_color);
-        }
-    }
-
-    std::clog << "Done.\n";
     return 0;
 }
