@@ -1,0 +1,88 @@
+#ifndef VEC3_H
+#define VEC3_H
+
+#include <iostream>
+#include <cmath>
+
+class VEC3 {
+private:
+    float m_x, m_y, m_z;
+public:
+
+    VEC3() : m_x(0), m_y(0), m_z(0) {}
+    VEC3(float e0, float e1, float e2) : m_x(e0), m_y(e1), m_z(e2) {}
+
+    float x() const { return m_x; }
+    float y() const { return m_y; }
+    float z() const { return m_z; }
+
+    inline VEC3 operator-() const { return VEC3(-m_x, -m_y, -m_z); }
+    inline float operator[](int i) const { return i == 0 ? m_x : (i == 1 ? m_y : m_z); }
+    inline float& operator[](int i) { return i == 0 ? m_x : (i == 1 ? m_y : m_z); }
+
+    inline VEC3& operator+=(const VEC3 &v) {
+        m_x += v.m_x;
+        m_y += v.m_y;
+        m_z += v.m_z;
+        return *this;
+    }
+
+    inline VEC3& operator*=(const float t) {
+        m_x *= t;
+        m_y *= t;
+        m_z *= t;
+        return *this;
+    }
+
+    inline VEC3& operator/=(const float t) {
+        return *this *= 1 / t;
+    }
+
+    float length() const {
+        return std::sqrt(length_squared());
+    }
+
+    float length_squared() const {
+        return m_x * m_x + m_y * m_y + m_z * m_z;
+    }
+};
+
+using POINT3 = VEC3;   // 3D point
+
+inline std::ostream& operator<<(std::ostream &out, const VEC3 &v) {
+    return out << v.x() << ' ' << v.y() << ' ' << v.z();
+}
+
+inline VEC3 operator+(const VEC3 &u, const VEC3 &v) {
+    return VEC3(u.x() + v.x(), u.y() + v.y(), u.z() + v.z());
+}
+
+inline VEC3 operator-(const VEC3 &u, const VEC3 &v) {
+    return VEC3(u.x() - v.x(), u.y() - v.y(), u.z() - v.z());
+}
+
+inline VEC3 operator*(const VEC3 &u, const VEC3 &v) {
+    return VEC3(u.x() * v.x(), u.y() * v.y(), u.z() * v.z());
+}
+
+inline VEC3 operator*(float t, const VEC3 &v) {
+    return VEC3(t * v.x(), t * v.y(), t * v.z());
+}
+
+inline VEC3 operator/(const VEC3 &v, float t) {
+    return (1 / t) * v;
+}
+
+inline float dot(const VEC3 &u, const VEC3 &v) {
+    return u.x() * v.x() + u.y() * v.y() + u.z() * v.z();
+}
+
+inline VEC3 cross(const VEC3 &u, const VEC3 &v) {
+    return VEC3(u.y() * v.z() - u.z() * v.y(), u.z() * v.x() - u.x() * v.z(), u.x() * v.y() - u.y() * v.x());
+}
+
+inline VEC3 unit_vector(const VEC3 &v) {
+    return v / v.length();
+}
+
+#endif // VEC3_H
