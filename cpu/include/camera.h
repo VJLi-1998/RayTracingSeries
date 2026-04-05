@@ -25,7 +25,7 @@ public:
 
                 for (int sample = 0; sample < samples_per_pixel; ++sample) {
                     RAY sample_ray = get_sample_ray(i, j);
-                    pixel_color += ray_color(sample_ray, world);
+                    pixel_color += ray_color(sample_ray, max_depth, world);
                 }
                 write_color(std::cout, pixel_color / samples_per_pixel);
             }
@@ -35,7 +35,8 @@ public:
     }
 
 private:
-    int samples_per_pixel = 1;
+    int samples_per_pixel = 10;
+    int max_depth = 50;
     int image_width, image_height;
     POINT3 camera_center;
     VEC3 pixel_delta_h, pixel_delta_v;
@@ -66,10 +67,15 @@ private:
         pixel_upleft = viewport_upleft + (pixel_delta_h + pixel_delta_v) / 2;
     }
 
-    COLOR ray_color(const RAY& r, const HITABLE_OBJECT& world) {
+    COLOR ray_color(const RAY& r, int depth, const HITABLE_OBJECT& world) {
+        if (depth <= 0) {
+            return COLOR(0, 0, 0);
+        }
+
         HIT_RECORD result;
-        if (world.hit(r, INTERVAL(0, infinity), result)) {
-            return 0.5 * COLOR(result.normal.x() + 1, result.normal.y() + 1, result.normal.z() + 1);
+        if (world.hit(r, INTERVAL(0.001, infinity), result)) {
+            VEC3 diffuse_reflection_direction = result.normal + get_random_vec_on_hemisphere(result.normal);
+            return 0.5 * ray_color(RAY(result.p, diffuse_reflection_direction), depth-1, world);
         }
 
         VEC3 unit_direction = unit_vector(r.direction());

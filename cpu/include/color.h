@@ -7,10 +7,15 @@
 
 using COLOR = VEC3;    // RGB color
 
+inline float gamma_transform(float value) {
+    if (value > 0) return std::sqrt(value);
+    else return 0;
+}
+
 void write_color(std::ostream &out, const COLOR& pixel_color) {
-    auto r = pixel_color.x();
-    auto g = pixel_color.y();
-    auto b = pixel_color.z();
+    auto r = gamma_transform(pixel_color.x());
+    auto g = gamma_transform(pixel_color.y());
+    auto b = gamma_transform(pixel_color.z());
 
     // Translate the [0,1] component values to the byte range [0,255].
     static const INTERVAL intensity(0.000, 0.999);
