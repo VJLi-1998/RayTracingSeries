@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include "hitable.h"
+#include "material.h"
 #include "common_header.h"
 
 class CAMERA {
@@ -35,7 +36,7 @@ public:
     }
 
 private:
-    int samples_per_pixel = 10;
+    int samples_per_pixel = 50;
     int max_depth = 50;
     int image_width, image_height;
     POINT3 camera_center;
@@ -74,8 +75,14 @@ private:
 
         HIT_RECORD result;
         if (world.hit(r, INTERVAL(0.001, infinity), result)) {
-            VEC3 diffuse_reflection_direction = result.normal + get_random_vec_on_hemisphere(result.normal);
-            return 0.5 * ray_color(RAY(result.p, diffuse_reflection_direction), depth-1, world);
+            RAY scattered;
+            COLOR attenuation;
+            if (result.mat->scatter(r, result, attenuation, scattered)) {
+                return attenuation * ray_color(scattered, depth-1, world);
+            }
+            return COLOR(0, 0, 0);
+            // VEC3 diffuse_reflection_direction = result.normal + get_random_vec_on_hemisphere(result.normal);
+            // return 0.5 * ray_color(RAY(result.p, diffuse_reflection_direction), depth-1, world);
         }
 
         VEC3 unit_direction = unit_vector(r.direction());

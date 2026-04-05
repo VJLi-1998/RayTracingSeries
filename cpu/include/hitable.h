@@ -6,12 +6,15 @@
 #include <vector>
 #include <memory>
 
+class MATERIAL;
+
 class HIT_RECORD {
     public:
         POINT3 p;
         VEC3 normal;
         float t;
         bool front_face;
+        std::shared_ptr<MATERIAL> mat;
 
     public:
         void set_face_normal(const RAY& r, const VEC3& outward_normal) {

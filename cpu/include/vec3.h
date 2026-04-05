@@ -45,6 +45,11 @@ public:
     float length_squared() const {
         return m_x * m_x + m_y * m_y + m_z * m_z;
     }
+
+    bool near_zero() const {
+        const float threshold = 1e-8;
+        return (std::fabs(m_x) < threshold) && (std::fabs(m_y) < threshold) && (std::fabs(m_z) < threshold);
+    }
 };
 
 using POINT3 = VEC3;   // 3D point
@@ -111,5 +116,8 @@ inline VEC3 get_random_vec_on_hemisphere(const VEC3& normal) {
     }
 }
 
+inline VEC3 get_reflect_vec(const VEC3& v, const VEC3& n) {
+    return v - 2 * dot(v, n) * n;
+}
 
 #endif // VEC3_H

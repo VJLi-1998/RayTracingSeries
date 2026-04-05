@@ -6,7 +6,8 @@
 class SPHERE : public HITABLE_OBJECT {
     public:
         SPHERE() {}
-        SPHERE(POINT3 cen, float r) : m_center(cen), m_radius(r) {}
+        SPHERE(const POINT3& cen, float r, std::shared_ptr<MATERIAL> mat) : 
+                    m_center(cen), m_radius(r), m_material(mat) {}
 
         virtual bool hit(const RAY& r, INTERVAL interval, HIT_RECORD& rec) const override {
             POINT3 oc = m_center - r.origin();
@@ -29,12 +30,14 @@ class SPHERE : public HITABLE_OBJECT {
             rec.p = r.at(rec.t);
             POINT3 outward_normal = (rec.p - m_center) / m_radius;
             rec.set_face_normal(r, outward_normal);
+            rec.mat = m_material;
             return true;
         }
 
     public:
         POINT3 m_center;
         float m_radius;
+        std::shared_ptr<MATERIAL> m_material;
 };
 
 #endif // SPHERE_H
