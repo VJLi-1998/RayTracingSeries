@@ -12,8 +12,8 @@ class MATERIAL {
 public:
     virtual ~MATERIAL() = default;
 
-    virtual bool scatter(const RAY& r_in, const HIT_RECORD& rec, 
-                COLOR& attenuation, RAY& scattered) const {
+    virtual bool scatter(const RAY&, const HIT_RECORD&, 
+                COLOR&, RAY&) const {
         return false;
     }
 };
@@ -22,7 +22,7 @@ class LAMBERTIAN : public MATERIAL {
 public:
     LAMBERTIAN(const COLOR& a) : m_albedo(a) {}
 
-    virtual bool scatter(const RAY& r_in, const HIT_RECORD& rec, 
+    virtual bool scatter(const RAY&, const HIT_RECORD& rec, 
                 COLOR& attenuation, RAY& scattered) const override {
         VEC3 scatter_direction = rec.normal + get_random_vec_on_hemisphere(rec.normal);
         if (scatter_direction.near_zero()) {

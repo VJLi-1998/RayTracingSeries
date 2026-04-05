@@ -35,13 +35,23 @@ public:
         std::clog << "Done.\n";
     }
 
+    void set_look_from(const POINT3& look_from) { this->look_from = look_from; }
+    void set_look_at(const POINT3& look_at) { this->look_at = look_at; }
+    void set_vfov(float vfov) { this->vfov = vfov; }
+    void set_samples_per_pixel(int samples) { this->samples_per_pixel = samples; }
+    void set_max_depth(int depth) { this->max_depth = depth; }
+
 private:
-    int samples_per_pixel = 50;
+    int samples_per_pixel = 10;
     int max_depth = 50;
     int image_width, image_height;
+    float vfov = 90; // vertical field of view in degrees
     POINT3 camera_center;
+    POINT3 look_from, look_at;
     VEC3 pixel_delta_h, pixel_delta_v;
     VEC3 pixel_upleft;
+    VEC3 u,v,w;
+    VEC3 view_up = VEC3(0, 1, 0);
 
     void initialize() {
         // IMAGE
@@ -50,21 +60,26 @@ private:
         image_height = static_cast<int>(image_width / aspect_ratio);
 
         // CAMERA
-        camera_center = POINT3(0, 0, 0);
+        camera_center = look_from;
 
-        float focal_length = 1.0;
+        float focal_length = (look_at - look_from).length();
+        float theta = degrees2radians(vfov);
+
+        w = unit_vector(look_from - look_at);
+        u = unit_vector(cross(view_up, w));
+        v = cross(w, u);
 
         // VIEWPORT
-        float viewport_height = 2.0;
+        float viewport_height = std::tan(theta/2) * focal_length * 2;
         float viewport_width = viewport_height * (1.0 * image_width / image_height);
 
-        VEC3 viewport_h = VEC3(viewport_width, 0, 0);
-        VEC3 viewport_v = VEC3(0, -viewport_height, 0);
+        VEC3 viewport_h = viewport_width * u;
+        VEC3 viewport_v = viewport_height * -v;
 
         pixel_delta_h = viewport_h / image_width;
         pixel_delta_v = viewport_v / image_height;
 
-        VEC3 viewport_upleft = camera_center - VEC3(0,0,focal_length) - viewport_h/2 - viewport_v/2;  
+        VEC3 viewport_upleft = camera_center - focal_length * w - viewport_h/2 - viewport_v/2;  
         pixel_upleft = viewport_upleft + (pixel_delta_h + pixel_delta_v) / 2;
     }
 

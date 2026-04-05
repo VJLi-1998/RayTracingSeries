@@ -90,9 +90,9 @@ inline VEC3 unit_vector(const VEC3 &v) {
     return v / v.length();
 }
 
-static VEC3 random_vec3() {
-    return VEC3(random_float(), random_float(), random_float());
-}
+// static VEC3 random_vec3() {
+//     return VEC3(random_float(), random_float(), random_float());
+// }
 
 static VEC3 random_vec3(float min, float max) {
     return VEC3(random_float(min, max), random_float(min, max), random_float(min, max));
