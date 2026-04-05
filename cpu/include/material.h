@@ -56,4 +56,40 @@ private:
     float m_fuzz;
 };
 
+class DIELECTRIC : public MATERIAL {
+public:
+    DIELECTRIC(float refraction_index) : m_ir(refraction_index) {}
+
+    bool scatter(const RAY& r_in, const HIT_RECORD& rec, 
+                COLOR& attenuation, RAY& scattered) const override {
+        attenuation = COLOR(1.0, 1.0, 1.0);
+        float refraction_ratio = rec.front_face ? (1.0 / m_ir) : m_ir;
+
+        VEC3 unit_direction = unit_vector(r_in.direction());
+        float cos_theta = fmin(dot(-unit_direction, rec.normal), 1.0);
+        float sin_theta = std::sqrt(1.0 - cos_theta * cos_theta);
+        bool cannot_refract = refraction_ratio * sin_theta > 1.0;
+        VEC3 direction;
+        if (cannot_refract || reflectance_ratio(cos_theta, refraction_ratio) > random_float()) {
+            direction = get_reflect_vec(unit_direction, rec.normal);
+        } else {
+            direction = get_refract_vec(unit_direction, rec.normal, refraction_ratio);
+        }
+
+        scattered = RAY(rec.p, direction);
+        return true;
+    }
+private:
+    static float reflectance_ratio(float cosine, float ref_idx) {
+        // Use Schlick's approximation for reflectance.
+        float r0 = (1-ref_idx) / (1+ref_idx);
+        r0 = r0*r0;
+        return r0 + (1-r0)*std::pow((1 - cosine),5);
+    }
+
+private:
+    float m_ir; // Index of Refraction
+
+};
+
 #endif // MATERIAL_H

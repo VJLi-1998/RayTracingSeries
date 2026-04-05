@@ -120,4 +120,11 @@ inline VEC3 get_reflect_vec(const VEC3& v, const VEC3& n) {
     return v - 2 * dot(v, n) * n;
 }
 
+inline VEC3 get_refract_vec(const VEC3& uv, const VEC3& n, float etai_over_etat) {
+    float cos_theta = fmin(dot(-uv, n), 1.0);
+    VEC3 r_out_perp = etai_over_etat * (uv + cos_theta * n);
+    VEC3 r_out_parallel = -std::sqrt(fabs(1.0 - r_out_perp.length_squared())) * n;
+    return r_out_perp + r_out_parallel;
+}
+
 #endif // VEC3_H
