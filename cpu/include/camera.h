@@ -40,11 +40,13 @@ public:
     void set_vfov(float vfov) { this->vfov = vfov; }
     void set_samples_per_pixel(int samples) { this->samples_per_pixel = samples; }
     void set_max_depth(int depth) { this->max_depth = depth; }
+    void set_image_width(int width) { this->image_width = width; }
+
 
 private:
     int samples_per_pixel = 10;
     int max_depth = 50;
-    int image_width, image_height;
+    int image_width = 400, image_height;
     float vfov = 90; // vertical field of view in degrees
     POINT3 camera_center;
     POINT3 look_from, look_at;
@@ -56,7 +58,6 @@ private:
     void initialize() {
         // IMAGE
         const float aspect_ratio = 16.0 / 9.0;
-        image_width = 400;
         image_height = static_cast<int>(image_width / aspect_ratio);
 
         // CAMERA

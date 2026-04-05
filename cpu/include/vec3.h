@@ -50,6 +50,15 @@ public:
         const float threshold = 1e-8;
         return (std::fabs(m_x) < threshold) && (std::fabs(m_y) < threshold) && (std::fabs(m_z) < threshold);
     }
+
+    static VEC3 random_vec3() {
+        return VEC3(random_float(), random_float(), random_float());
+    }
+
+    static VEC3 random_vec3(float min, float max) {
+        return VEC3(random_float(min, max), random_float(min, max), random_float(min, max));
+    }
+
 };
 
 using POINT3 = VEC3;   // 3D point
@@ -90,17 +99,9 @@ inline VEC3 unit_vector(const VEC3 &v) {
     return v / v.length();
 }
 
-// static VEC3 random_vec3() {
-//     return VEC3(random_float(), random_float(), random_float());
-// }
-
-static VEC3 random_vec3(float min, float max) {
-    return VEC3(random_float(min, max), random_float(min, max), random_float(min, max));
-}
-
 inline VEC3 reject_sample_vec() {
     while (true) {
-        VEC3 sample = random_vec3(-1, 1);
+        VEC3 sample = VEC3::random_vec3(-1, 1);
         float length_squared = sample.length_squared();
         if (length_squared >= 1 && length_squared < 1e-10) continue;
         return sample / std::sqrt(length_squared);
