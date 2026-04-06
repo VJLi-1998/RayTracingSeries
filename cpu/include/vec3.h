@@ -99,6 +99,14 @@ inline VEC3 unit_vector(const VEC3 &v) {
     return v / v.length();
 }
 
+inline VEC3 random_in_unit_disk() {
+    while (true) {
+        VEC3 sample = VEC3(random_float(-1, 1), random_float(-1, 1), 0);
+        if (sample.length_squared() >= 1) continue;
+        return sample;
+    }
+}
+
 inline VEC3 reject_sample_vec() {
     while (true) {
         VEC3 sample = VEC3::random_vec3(-1, 1);

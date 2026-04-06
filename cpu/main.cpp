@@ -54,12 +54,15 @@ int main() {
 
     // CAMERA
     CAMERA cam;
-    cam.set_image_width(400);
+    cam.set_image_width(1200);
     cam.set_samples_per_pixel(100);
-    cam.set_look_at(POINT3(0, 0, -1));
+    cam.set_look_at(POINT3(0, 0, 0));
     cam.set_look_from(POINT3(13, 2, 3));
     cam.set_vfov(20);
     cam.set_max_depth(50);
+    cam.set_defocus_angle(0.6);
+    cam.set_focus_distance(10);
+
     cam.render(world);
 
     return 0;
