@@ -29,6 +29,11 @@ inline float random_float(float min, float max) {
     return min + (max-min)*random_float();
 }
 
+inline int random_int(int min, int max) {
+    // Returns a random integer in [min,max].
+    return int(random_float(min, max+1));
+}
+
 // Common Headers
 
 #include "color.h"

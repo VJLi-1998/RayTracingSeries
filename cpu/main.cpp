@@ -5,6 +5,7 @@
 #include "include/sphere.h"
 #include "include/camera.h"
 #include "include/material.h"
+#include "include/bvh.h"
 
 int main() {
 
@@ -51,6 +52,8 @@ int main() {
 
     auto material3 = std::make_shared<METAL>(COLOR(0.7, 0.6, 0.5), 0.0);
     world.add(std::make_shared<SPHERE>(POINT3(4, 1, 0), 1.0, material3));
+
+    world = HITABLE_OBJECT_LIST(std::make_shared<BVH_NODE>(world));
 
     // CAMERA
     CAMERA cam;

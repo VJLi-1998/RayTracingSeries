@@ -26,6 +26,9 @@ class HIT_RECORD {
 class HITABLE_OBJECT {
     public:
         virtual bool hit(const RAY& r, INTERVAL interval, HIT_RECORD& rec) const = 0;
+        
+        virtual AABB bounding_box() const = 0;
+
 };
 
 class HITABLE_OBJECT_LIST : public HITABLE_OBJECT {
@@ -35,7 +38,12 @@ class HITABLE_OBJECT_LIST : public HITABLE_OBJECT {
         HITABLE_OBJECT_LIST(std::vector<std::shared_ptr<HITABLE_OBJECT>> objects) : m_objects(objects) {}
 
         void clear() { m_objects.clear(); }
-        void add(std::shared_ptr<HITABLE_OBJECT> object) { m_objects.push_back(object); }
+        void add(std::shared_ptr<HITABLE_OBJECT> object) { 
+            m_objects.push_back(object); 
+            m_bbox = AABB(m_bbox, object->bounding_box());
+        }
+
+        std::vector<std::shared_ptr<HITABLE_OBJECT>>& objects() { return m_objects; }
 
         virtual bool hit(const RAY& r, INTERVAL interval, HIT_RECORD& rec) const override {
             HIT_RECORD temp_rec;
@@ -53,8 +61,13 @@ class HITABLE_OBJECT_LIST : public HITABLE_OBJECT {
             return hit_anything;
         }
 
+        virtual AABB bounding_box() const override {
+            return m_bbox;
+        }
+
     private:
         std::vector<std::shared_ptr<HITABLE_OBJECT>> m_objects;
+        AABB m_bbox;
 };
 
 #endif // HITALBE_H
